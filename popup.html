@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      width: 250px;
+      padding: 15px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #fff;
+      color: #262626;
+    }
+    h2 {
+      font-size: 16px;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #dbdbdb;
+      padding-bottom: 8px;
+    }
+    .feature-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .feature-name {
+      font-size: 14px;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 20px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #0095f6;
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+    select {
+      font-size: 12px;
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 1px solid #dbdbdb;
+    }
+    .footer {
+      font-size: 11px;
+      color: #8e8e8e;
+      margin-top: 15px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h2>Insta AI Tools</h2>
+  
+  <div class="feature-item">
+    <span class="feature-name">Verified Badge</span>
+    <label class="switch">
+      <input type="checkbox" id="verifiedBadge">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="feature-item">
+    <span class="feature-name">Custom Theme</span>
+    <select id="customTheme">
+      <option value="none">Default</option>
+      <option value="midnight">Midnight Black</option>
+      <option value="pastel">Pastel Pink</option>
+    </select>
+  </div>
+
+  <div class="feature-item">
+    <span class="feature-name">Ad Blocker</span>
+    <label class="switch">
+      <input type="checkbox" id="adBlock">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="feature-item">
+    <span class="feature-name">Incognito Viewer</span>
+    <label class="switch">
+      <input type="checkbox" id="incognitoMode">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="feature-item">
+    <span class="feature-name">Image Hider (DMs)</span>
+    <label class="switch">
+      <input type="checkbox" id="imageHider">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="footer">
+    v5.1.12 | Instagram Downloader
+  </div>
+
+  <script src="src/js/popup.js"></script>
+</body>
+</html>

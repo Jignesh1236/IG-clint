@@ -72,7 +72,7 @@ const appState = Object.freeze((() => {
                 current.highlights = value;
                 downloadStoryPhotos('highlights').then(data => {
                     renderMedia(data);
-                    currentDisplay = 'hightlights';
+                    currentDisplay = 'highlights';
                 });
             },
         }),
@@ -186,16 +186,24 @@ const appState = Object.freeze((() => {
             }
         }
         function hideExtension() {
-            DOWNLOAD_BUTTON.setAttribute('hidden', 'true');
-            DISPLAY_CONTAINER.classList.add('hide');
-            DISPLAY_CONTAINER.setAttribute('style', 'display: none;');
-            // Usage requestAnimationFrame to bypass transition attribute
-            requestAnimationFrame(() => {
-                DISPLAY_CONTAINER.removeAttribute('style');
-            });
+            if (DOWNLOAD_BUTTON) {
+                DOWNLOAD_BUTTON.setAttribute('hidden', 'true');
+                DOWNLOAD_BUTTON.style.display = 'none';
+            }
+            if (DISPLAY_CONTAINER) {
+                DISPLAY_CONTAINER.classList.add('hide');
+                DISPLAY_CONTAINER.setAttribute('style', 'display: none;');
+                // Usage requestAnimationFrame to bypass transition attribute
+                requestAnimationFrame(() => {
+                    DISPLAY_CONTAINER.removeAttribute('style');
+                });
+            }
         }
         function showExtension() {
-            DOWNLOAD_BUTTON.removeAttribute('hidden');
+            if (DOWNLOAD_BUTTON) {
+                DOWNLOAD_BUTTON.removeAttribute('hidden');
+                DOWNLOAD_BUTTON.style.display = '';
+            }
         }
         function handleChatTab() {
             const reactRoot = document.body.querySelector('[id]');
@@ -279,6 +287,11 @@ const appState = Object.freeze((() => {
             TITLE_CONTAINER.classList.toggle('multi-select');
         }, handleSelectAll);
         DOWNLOAD_BUTTON.addEventListener('click', handleDownload);
+        // Add touch support for mobile
+        DOWNLOAD_BUTTON.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            handleDownload();
+        });
         window.addEventListener('online', () => {
             DISPLAY_CONTAINER.querySelectorAll('img , video').forEach(media => {
                 media.src = media.src;
@@ -322,8 +335,13 @@ const appState = Object.freeze((() => {
         setTheme();
         handleChatTab();
         if (window.location.pathname.startsWith('/direct')) {
-            DOWNLOAD_BUTTON.setAttribute('hidden', 'true');
-            DISPLAY_CONTAINER.classList.add('hide');
+            if (DOWNLOAD_BUTTON) {
+                DOWNLOAD_BUTTON.setAttribute('hidden', 'true');
+                DOWNLOAD_BUTTON.style.display = 'none';
+            }
+            if (DISPLAY_CONTAINER) {
+                DISPLAY_CONTAINER.classList.add('hide');
+            }
         }
     }
     function run() {

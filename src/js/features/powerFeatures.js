@@ -1,36 +1,37 @@
+// Wrap in an IIFE to avoid leaking globals into the page scope
+(() => {
+    let isStealthMode = false;
+    let settings = {
+        hideTyping: true,
+        stealthMode: true
+    };
 
-let isStealthMode = false;
-let settings = {
-    hideTyping: true,
-    stealthMode: true
-};
+    chrome.storage.local.get(['hideTyping', 'stealthMode'], (result) => {
+        settings.hideTyping = result.hideTyping !== undefined ? result.hideTyping : true;
+        settings.stealthMode = result.stealthMode !== undefined ? result.stealthMode : true;
+        updateAll();
+    });
 
-chrome.storage.local.get(['hideTyping', 'stealthMode'], (result) => {
-    settings.hideTyping = result.hideTyping !== undefined ? result.hideTyping : true;
-    settings.stealthMode = result.stealthMode !== undefined ? result.stealthMode : true;
-    updateAll();
-});
+    chrome.storage.onChanged.addListener((changes) => {
+        if (changes.hideTyping) settings.hideTyping = changes.hideTyping.newValue;
+        if (changes.stealthMode) settings.stealthMode = changes.stealthMode.newValue;
+        updateAll();
+    });
 
-chrome.storage.onChanged.addListener((changes) => {
-    if (changes.hideTyping) settings.hideTyping = changes.hideTyping.newValue;
-    if (changes.stealthMode) settings.stealthMode = changes.stealthMode.newValue;
-    updateAll();
-});
-
-function updateAll() {
-    toggleHideTyping(settings.hideTyping);
-    if (!settings.stealthMode && isStealthMode) {
-        isStealthMode = false;
-        document.documentElement.classList.remove('insta-stealth-active');
+    function updateAll() {
+        toggleHideTyping(settings.hideTyping);
+        if (!settings.stealthMode && isStealthMode) {
+            isStealthMode = false;
+            document.documentElement.classList.remove('insta-stealth-active');
+        }
     }
-}
 
-function initPowerFeatures() {
-    if (document.getElementById('insta-ai-power-styles')) return;
+    function initPowerFeatures() {
+        if (document.getElementById('insta-ai-power-styles')) return;
 
-    const style = document.createElement('style');
-    style.id = 'insta-ai-power-styles';
-    style.innerHTML = `
+        const style = document.createElement('style');
+        style.id = 'insta-ai-power-styles';
+        style.innerHTML = `
     /* Stealth Mode: Global Panic Blur */
     html.insta-stealth-active {
       filter: blur(50px) grayscale(1) !important;
@@ -53,26 +54,27 @@ function initPowerFeatures() {
       visibility: hidden !important;
     }
   `;
-    document.head.appendChild(style);
+        document.head.appendChild(style);
 
-    const overlay = document.createElement('div');
-    overlay.className = 'stealth-overlay';
-    document.body.appendChild(overlay);
+        const overlay = document.createElement('div');
+        overlay.className = 'stealth-overlay';
+        document.body.appendChild(overlay);
 
-    // Global Key Listener for Stealth Mode
-    window.addEventListener('keydown', (e) => {
-        if (settings.stealthMode && e.altKey && (e.code === 'KeyX' || e.key.toLowerCase() === 'x')) {
-            e.preventDefault();
-            e.stopPropagation();
-            isStealthMode = !isStealthMode;
-            document.documentElement.classList.toggle('insta-stealth-active', isStealthMode);
-        }
-    }, true);
-}
+        // Global Key Listener for Stealth Mode
+        window.addEventListener('keydown', (e) => {
+            if (settings.stealthMode && e.altKey && (e.code === 'KeyX' || e.key.toLowerCase() === 'x')) {
+                e.preventDefault();
+                e.stopPropagation();
+                isStealthMode = !isStealthMode;
+                document.documentElement.classList.toggle('insta-stealth-active', isStealthMode);
+            }
+        }, true);
+    }
 
-function toggleHideTyping(enabled) {
-    document.body.classList.toggle('insta-hide-typing', enabled);
-}
+    function toggleHideTyping(enabled) {
+        document.body.classList.toggle('insta-hide-typing', enabled);
+    }
 
-// Auto-init power features
-initPowerFeatures();
+    // Auto-init power features
+    initPowerFeatures();
+})();

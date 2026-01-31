@@ -3,50 +3,141 @@
 <head>
   <meta charset="UTF-8">
   <style>
+    :root {
+      --accent: #0095f6;
+      --accent-soft: rgba(0, 149, 246, 0.08);
+      --border: #dbdbdb;
+      --text-muted: #8e8e8e;
+      --bg: #ffffff;
+      --bg-soft: #fafafa;
+    }
+
     body {
-      width: 250px;
-      padding: 15px;
+      width: 280px;
+      min-width: 280px;
+      max-width: 100%;
+      padding: 14px 14px 10px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #fff;
+      background: radial-gradient(circle at top left, #fdfbff 0, #ffffff 40%, #f6f9ff 100%);
       color: #262626;
+      margin: 0;
+      box-sizing: border-box;
     }
+
+    @media (max-width: 400px) {
+      body {
+        width: 100%;
+        padding: 12px 10px 8px;
+      }
+    }
+
     h2 {
-      font-size: 16px;
-      margin-bottom: 15px;
-      border-bottom: 1px solid #dbdbdb;
-      padding-bottom: 8px;
+      font-size: 15px;
+      margin: 0 0 6px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
+
+    .subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .badge-pill {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .section {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(219, 219, 219, 0.8);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    @media (max-width: 400px) {
+      .section {
+        padding: 6px 8px;
+        margin-bottom: 6px;
+      }
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
     .feature-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      gap: 8px;
+      padding: 6px 0;
     }
+
+    .feature-main {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
     .feature-name {
-      font-size: 14px;
+      font-size: 13px;
+      font-weight: 500;
     }
+
+    .feature-helper {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
     .switch {
       position: relative;
       display: inline-block;
-      width: 40px;
+      width: 38px;
       height: 20px;
+      flex-shrink: 0;
+      touch-action: manipulation;
     }
+
+    @media (max-width: 400px) {
+      .switch {
+        width: 36px;
+        height: 18px;
+      }
+    }
+
     .switch input {
       opacity: 0;
       width: 0;
       height: 0;
     }
+
     .slider {
       position: absolute;
       cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      inset: 0;
       background-color: #ccc;
-      transition: .4s;
+      transition: .25s;
       border-radius: 20px;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.02);
     }
+
     .slider:before {
       position: absolute;
       content: "";
@@ -55,75 +146,299 @@
       left: 3px;
       bottom: 3px;
       background-color: white;
-      transition: .4s;
+      transition: .25s;
       border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
+
+    @media (max-width: 400px) {
+      .slider:before {
+        height: 12px;
+        width: 12px;
+        left: 3px;
+        bottom: 3px;
+      }
+    }
+
     input:checked + .slider {
-      background-color: #0095f6;
+      background-color: var(--accent);
     }
+
     input:checked + .slider:before {
-      transform: translateX(20px);
+      transform: translateX(18px);
     }
+
+    @media (max-width: 400px) {
+      input:checked + .slider:before {
+        transform: translateX(16px);
+      }
+    }
+
     select {
       font-size: 12px;
-      padding: 2px 5px;
-      border-radius: 4px;
-      border: 1px solid #dbdbdb;
+      padding: 3px 6px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      cursor: pointer;
+      touch-action: manipulation;
     }
+
+    select:hover {
+      border-color: var(--accent);
+    }
+
+    select:focus {
+      outline: 2px solid var(--accent-soft);
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 400px) {
+      select {
+        font-size: 11px;
+        padding: 4px 8px;
+      }
+    }
+
+    input[type="text"] {
+      font-size: 10px;
+      padding: 3px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      width: 100%;
+      font-family: inherit;
+    }
+
+    input[type="text"]:focus {
+      outline: 2px solid var(--accent-soft);
+      outline-offset: 2px;
+      border-color: var(--accent);
+    }
+
+    button {
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+      margin-top: 2px;
+      font-family: inherit;
+      font-weight: 500;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background: #0084d4;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
     .footer {
-      font-size: 11px;
-      color: #8e8e8e;
-      margin-top: 15px;
-      text-align: center;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(219, 219, 219, 0.8);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .kbd-hint {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    .kbd-hint code {
+      font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+      font-size: 10px;
+      padding: 1px 4px;
+      border-radius: 4px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: var(--bg-soft);
     }
   </style>
 </head>
 <body>
-  <h2>Insta AI Tools</h2>
-  
-  <div class="feature-item">
-    <span class="feature-name">Verified Badge</span>
-    <label class="switch">
-      <input type="checkbox" id="verifiedBadge">
-      <span class="slider"></span>
-    </label>
+  <h2>
+    Insta AI Tools
+    <span class="badge-pill">ON‑PAGE</span>
+  </h2>
+  <div class="subtitle">Quick controls for downloads, privacy, and UI tweaks.</div>
+
+  <div class="section">
+    <div class="section-title">Visual</div>
+
+    <div class="feature-item">
+      <div class="feature-main">
+        <span class="feature-name">Verified Badge</span>
+        <span class="feature-helper">Show a custom blue tick next to your username.</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="verifiedBadge">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="feature-item">
+      <div class="feature-main">
+        <span class="feature-name">Custom Theme</span>
+        <span class="feature-helper">Choose a mood for Instagram UI.</span>
+      </div>
+      <select id="customTheme">
+        <option value="none">Default</option>
+        <option value="midnight">Midnight Black</option>
+        <option value="pastel">Pastel Pink</option>
+      </select>
+    </div>
+
+    <div class="feature-item">
+      <div class="feature-main">
+        <span class="feature-name">Sync with Instagram Dark Mode</span>
+        <span class="feature-helper">Automatically sync theme with Instagram's dark mode.</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="darkModeSync">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="feature-item">
+      <div class="feature-main">
+        <span class="feature-name">Custom Theme Colors</span>
+        <span class="feature-helper">Set custom RGB colors (e.g., "255,255,255").</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+        <input type="text" id="customPrimaryBg" placeholder="Primary BG (RGB)" style="font-size: 10px; padding: 3px 6px; border-radius: 4px; border: 1px solid var(--border); width: 100%;">
+        <input type="text" id="customPrimaryText" placeholder="Primary Text (RGB)" style="font-size: 10px; padding: 3px 6px; border-radius: 4px; border: 1px solid var(--border); width: 100%;">
+        <input type="text" id="customAccent" placeholder="Accent (RGB)" style="font-size: 10px; padding: 3px 6px; border-radius: 4px; border: 1px solid var(--border); width: 100%;">
+        <button id="applyCustomColors" style="font-size: 10px; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--accent); background: var(--accent); color: white; cursor: pointer; margin-top: 2px;">Apply Colors</button>
+      </div>
+    </div>
   </div>
 
-  <div class="feature-item">
-    <span class="feature-name">Custom Theme</span>
-    <select id="customTheme">
-      <option value="none">Default</option>
-      <option value="midnight">Midnight Black</option>
-      <option value="pastel">Pastel Pink</option>
-    </select>
+  <div class="section">
+    <div class="section-title">Privacy & Focus</div>
+
+    <div class="feature-item">
+      <div class="feature-main">
+        <span class="feature-name">Incognito Story Viewer</span>
+        <span class="feature-helper">Prevent story “seen” status. Uses network‑level blocking.</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="incognitoMode">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="feature-item">
+      <div class="feature-main">
+        <span class="feature-name">Privacy Blur</span>
+        <span class="feature-helper">Blur feed media on demand (shortcut Alt+P).</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="privacyMode">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="feature-item">
+      <div class="feature-main">
+        <span class="feature-name">Hide Typing Indicator</span>
+        <span class="feature-helper">Hide “typing…” indicators in DMs.</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="hideTyping">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="feature-item">
+      <div class="feature-main">
+        <span class="feature-name">Stealth Panic Blur</span>
+        <span class="feature-helper">Instantly blur everything with Alt+X.</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="stealthMode">
+        <span class="slider"></span>
+      </label>
+    </div>
   </div>
 
-  <div class="feature-item">
-    <span class="feature-name">Ad Blocker</span>
-    <label class="switch">
-      <input type="checkbox" id="adBlock">
-      <span class="slider"></span>
-    </label>
+  <div class="section">
+    <div class="section-title">Analytics</div>
+
+    <div class="feature-item">
+      <div class="feature-main">
+        <span class="feature-name">Follower Analytics</span>
+        <span class="feature-helper">Track followers/unfollowers over time.</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="followerAnalytics">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="feature-item">
+      <div class="feature-main">
+        <span class="feature-name">Engagement Calculator</span>
+        <span class="feature-helper">Calculate likes/comments ratio on posts.</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="engagementCalculator">
+        <span class="slider"></span>
+      </label>
+    </div>
   </div>
 
-  <div class="feature-item">
-    <span class="feature-name">Incognito Viewer</span>
-    <label class="switch">
-      <input type="checkbox" id="incognitoMode">
-      <span class="slider"></span>
-    </label>
-  </div>
+  <div class="section">
+    <div class="section-title">DM & Ads</div>
 
-  <div class="feature-item">
-    <span class="feature-name">Image Hider (DMs)</span>
-    <label class="switch">
-      <input type="checkbox" id="imageHider">
-      <span class="slider"></span>
-    </label>
+    <div class="feature-item">
+      <div class="feature-main">
+        <span class="feature-name">Image Hider (DMs)</span>
+        <span class="feature-helper">Adds hide/unhide button on DM images.</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="imageHider">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="feature-item">
+      <div class="feature-main">
+        <span class="feature-name">Ad Blocker</span>
+        <span class="feature-helper">Try to hide Sponsored posts and story ads.</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="adBlock">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="feature-item">
+      <div class="feature-main">
+        <span class="feature-name">Read Receipt Blocker</span>
+        <span class="feature-helper">Block "seen" status in DMs.</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="readReceiptBlocker">
+        <span class="slider"></span>
+      </label>
+    </div>
   </div>
 
   <div class="footer">
-    v5.1.12 | Instagram Downloader
+    <span>v5.1.12 · Instagram Downloader</span>
+    <div class="kbd-hint">
+      <div><code>D</code> download · <code>S</code> select</div>
+    </div>
   </div>
 
   <script src="src/js/popup.js"></script>

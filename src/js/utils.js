@@ -56,9 +56,16 @@ function getValueByKey(obj, key) {
 
 function resetDownloadState() {
     const DOWNLOAD_BUTTON = document.querySelector('.download-button');
+    if (!DOWNLOAD_BUTTON) return;
     DOWNLOAD_BUTTON.classList.remove('loading');
-    DOWNLOAD_BUTTON.textContent = 'Download';
+    // Preserve mobile icon behavior - only set text if not mobile
+    if (window.innerWidth > 767) {
+        DOWNLOAD_BUTTON.textContent = 'Download';
+    } else {
+        DOWNLOAD_BUTTON.textContent = '';
+    }
     DOWNLOAD_BUTTON.disabled = false;
+    DOWNLOAD_BUTTON.removeAttribute('hidden');
 }
 
 async function saveMedia(media, fileName) {
@@ -73,40 +80,54 @@ async function saveMedia(media, fileName) {
 
 async function saveZip() {
     const DOWNLOAD_BUTTON = document.querySelector('.download-button');
+    if (!DOWNLOAD_BUTTON) return;
     DOWNLOAD_BUTTON.classList.add('loading');
-    DOWNLOAD_BUTTON.textContent = 'Loading...';
+    if (window.innerWidth > 767) {
+        DOWNLOAD_BUTTON.textContent = 'Loading...';
+    } else {
+        DOWNLOAD_BUTTON.textContent = '';
+    }
     DOWNLOAD_BUTTON.disabled = true;
     const media = Array.from(document.querySelectorAll('.overlay.checked')).map(item => item.previousElementSibling);
+    if (media.length === 0) {
+        resetDownloadState();
+        return;
+    }
     const zipFileName = media[0].title.replaceAll(' | ', '_') + '.zip';
     async function fetchSelectedMedia() {
         let count = 0;
-        const results = await Promise.allSettled(media.map(async (media) => {
-            const res = await fetch(media.src);
+        const results = await Promise.allSettled(media.map(async (mediaItem) => {
+            const res = await fetch(mediaItem.src);
+            if (!res.ok) throw new Error(`Failed to fetch ${mediaItem.src}`);
             const blob = await res.blob();
             const data = {
-                title: media.title.replaceAll(' | ', '_'),
+                title: mediaItem.title.replaceAll(' | ', '_'),
                 data: blob
             };
-            data.title = media.nodeName === 'VIDEO' ? `${data.title}.mp4` : `${data.title}.jpeg`;
+            data.title = mediaItem.nodeName === 'VIDEO' ? `${data.title}.mp4` : `${data.title}.jpeg`;
             count++;
-            DOWNLOAD_BUTTON.textContent = `${count}/${media.length}`;
+            if (window.innerWidth > 767) {
+                DOWNLOAD_BUTTON.textContent = `${count}/${media.length}`;
+            }
             return data;
         }));
-        results.forEach(promise => {
-            if (promise.status === 'rejected') throw new Error('Fail to fetch');
-        });
+        const rejected = results.filter(p => p.status === 'rejected');
+        if (rejected.length > 0) {
+            console.error('Some downloads failed:', rejected);
+            throw new Error(`Failed to fetch ${rejected.length} media file(s)`);
+        }
         return results.map(promise => promise.value);
     }
     try {
-        const media = await fetchSelectedMedia();
-        const blob = await createZip(media);
+        const mediaData = await fetchSelectedMedia();
+        const blob = await createZip(mediaData);
         saveFile(blob, zipFileName);
         document.querySelectorAll('.overlay').forEach(element => {
             element.classList.remove('checked');
         });
         resetDownloadState();
     } catch (error) {
-        console.log(error);
+        console.error('Zip creation error:', error);
         resetDownloadState();
     }
 }
@@ -140,10 +161,15 @@ function shouldDownload() {
 function setDownloadState(state = 'ready') {
     const DOWNLOAD_BUTTON = document.querySelector('.download-button');
     const MEDIA_CONTAINER = document.querySelector('.media-container');
+    if (!DOWNLOAD_BUTTON || !MEDIA_CONTAINER) return;
     const options = {
         ready() {
             DOWNLOAD_BUTTON.classList.add('loading');
-            DOWNLOAD_BUTTON.textContent = 'Loading...';
+            if (window.innerWidth > 767) {
+                DOWNLOAD_BUTTON.textContent = 'Loading...';
+            } else {
+                DOWNLOAD_BUTTON.textContent = '';
+            }
             DOWNLOAD_BUTTON.disabled = true;
             MEDIA_CONTAINER.replaceChildren();
         },
@@ -157,14 +183,27 @@ function setDownloadState(state = 'ready') {
                 loadedPhotos++;
                 if (loadedPhotos === photosArray.length) resetDownloadState();
             }
+            if (photosArray.length === 0) {
+                resetDownloadState();
+                return;
+            }
             photosArray.forEach(media => {
                 if (media.tagName === 'IMG') {
-                    media.addEventListener('load', countLoaded);
-                    media.addEventListener('error', countLoaded);
+                    if (media.complete) {
+                        countLoaded();
+                    } else {
+                        media.addEventListener('load', countLoaded, { once: true });
+                        media.addEventListener('error', countLoaded, { once: true });
+                    }
                 }
                 else {
-                    media.addEventListener('loadeddata', countLoaded);
-                    media.addEventListener('abort', countLoaded);
+                    if (media.readyState >= 2) {
+                        countLoaded();
+                    } else {
+                        media.addEventListener('loadeddata', countLoaded, { once: true });
+                        media.addEventListener('abort', countLoaded, { once: true });
+                        media.addEventListener('error', countLoaded, { once: true });
+                    }
                 }
             });
         }
@@ -174,8 +213,20 @@ function setDownloadState(state = 'ready') {
 
 async function handleDownload() {
     let data = null;
-    const TITLE_CONTAINER = document.querySelector('.title-container').firstElementChild;
+    const TITLE_CONTAINER = document.querySelector('.title-container')?.firstElementChild;
     const DISPLAY_CONTAINER = document.querySelector('.display-container');
+    const DOWNLOAD_BUTTON = document.querySelector('.download-button');
+    
+    if (!DOWNLOAD_BUTTON || !DISPLAY_CONTAINER || !TITLE_CONTAINER) {
+        console.error('Download button or container not found');
+        return;
+    }
+    
+    // Prevent multiple simultaneous downloads
+    if (DOWNLOAD_BUTTON.disabled || DOWNLOAD_BUTTON.classList.contains('loading')) {
+        return;
+    }
+    
     const option = shouldDownload();
     const totalItemChecked = Array.from(document.querySelectorAll('.overlay.checked'));
     if (TITLE_CONTAINER.classList.contains('multi-select')
@@ -185,12 +236,26 @@ async function handleDownload() {
         return saveZip();
     }
     requestAnimationFrame(() => { DISPLAY_CONTAINER.classList.remove('hide'); });
-    if (option === 'none') return;
+    if (option === 'none') {
+        // If no option but display is hidden, show it
+        if (DISPLAY_CONTAINER.classList.contains('hide')) {
+            DISPLAY_CONTAINER.classList.remove('hide');
+        }
+        return;
+    }
     setDownloadState('ready');
-    option === 'post' ? data = await downloadPostPhotos() : data = await downloadStoryPhotos(option);
-    if (!data) return setDownloadState('fail');
-    appState.currentDisplay = option;
-    renderMedia(data);
+    try {
+        option === 'post' ? data = await downloadPostPhotos() : data = await downloadStoryPhotos(option);
+        if (!data) {
+            setDownloadState('fail');
+            return;
+        }
+        appState.currentDisplay = option;
+        renderMedia(data);
+    } catch (error) {
+        console.error('Download error:', error);
+        setDownloadState('fail');
+    }
 }
 
 function renderMedia(data) {
